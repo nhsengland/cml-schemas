@@ -20,65 +20,94 @@ The CML—and therefore these schemas—are in **beta** while we pilot with anal
 
 ***
 
-## What’s in the box
+## What's in the box
 
-*   **Spark schemas** for core CML entities (initial set):
-    *   `metric` — the measured value(s) and identifiers
-    *   `dimension` — dimensions and members used to slice metrics  
-    
+**Spark schemas** for core CML entities (initial set):
+
+*   `METRIC_SCHEMA` — the measured value(s) and identifiers
+*   `DIMENSIONS_SCHEMA` — base schema for dimensions used to slice metrics
+
+**Helper functions:**
+
+*   `create_dimensions_schema(dimensions)` — builds a full dimensions schema from a list of dimension column names
+*   `select_from_schema(df, schema)` — selects and reorders DataFrame columns to match a schema
+*   `validate_schema(df, schema)` — validates a DataFrame's column names and types against a schema
+
 These mirror the "draft standardised schema" referenced in the CML materials and will track the official spec as it matures.
 
-TODO:
+**Coming soon:**
 
-*   `metadata` — descriptive info: purpose, methodology, caveats, lineage, etc.
-*   `relationship` — links between metrics and other artefacts
+*   `metadata` schema — descriptive info: purpose, methodology, caveats, lineage, etc.
+*   `relationship` schema — links between metrics and other artefacts
 
 ***
 
 ## Installation
 
-pip:
-
 ```bash
 pip install cml-schemas
 ```
 
-> Tip: Pin to a specific version (`cml-schemas==x.y.z`) 
+> Tip: Pin to a specific version (`cml-schemas==x.y.z`) to protect your pipelines from breaking changes during beta.
 
 ***
 
 ## Quick start (Spark)
 
-### Example: creating an empty, schema-correct DataFrame
+### Use a built-in schema
 
 ```python
-from cml_schemas.spark import get_schema
-metric_schema = get_schema("metric")
-empty = spark.createDataFrame([], schema=metric_schema)
+from cml_schemas import spark_schemas
+
+# Create an empty, schema-correct DataFrame
+empty_df = spark.createDataFrame([], schema=spark_schemas.METRIC_SCHEMA)
+```
+
+### Build a dimensions schema dynamically
+
+```python
+from cml_schemas import spark_schemas
+
+dimensions = ["AgeGroup", "Region", "Ethnicity"]
+schema = spark_schemas.create_dimensions_schema(dimensions)
+
+empty_df = spark.createDataFrame([], schema=schema)
+```
+
+### Validate a DataFrame against a schema
+
+```python
+from cml_schemas import spark_schemas
+
+# Raises TypeError with all mismatches listed if validation fails
+spark_schemas.validate_schema(df, spark_schemas.METRIC_SCHEMA)
+```
+
+### Select and reorder columns to match a schema
+
+```python
+from cml_schemas import spark_schemas
+
+# Selects only the columns defined in the schema, in schema order
+df = spark_schemas.select_from_schema(df, spark_schemas.METRIC_SCHEMA)
 ```
 
 ***
 
 ## Principles for usage
 
-*   **Spec-first**: Schemas track the CML Data Specification (draft during beta). When the official fields or formats change, this package revs a minor or major version, with changelog notes. We recommend locking to a specific version of this package to avoid breaking changes when the schema is updated!
-*   **Build from tidy data where possible**: Aim to produce metrics by first producing outputs in tidy-data format and converting from there to the CML spec. See the [CML conversion helper functions](https://github.com/nhsengland/cml-conversion-helpers/tree/feature/cml-helper-functions).
-*   **RAP**: Aim to develop your pipelines in line with RAP (Reproducible Analytical Pipelines) principles - see the [RAP Community of Practice website](https://nhsdigital.github.io/rap-community-of-practice/) for guidance.
+*   **Spec-first**: Schemas track the CML Data Specification (draft during beta). When the official fields or formats change, this package revs a minor or major version, with changelog notes. We recommend locking to a specific version of this package to avoid breaking changes when the schema is updated.
+*   **Build from tidy data where possible**: Aim to produce metrics by first producing outputs in tidy-data format and converting from there to the CML spec. See the [CML conversion helper functions](https://github.com/nhsengland/cml-conversion-helpers).
+*   **RAP**: Aim to develop your pipelines in line with RAP (Reproducible Analytical Pipelines) principles — see the [RAP Community of Practice website](https://nhsdigital.github.io/rap-community-of-practice/) for guidance.
 
 ***
 
 ## How this maps to the CML artefacts
 
-*   **CML Proforma & Spec**: Informs field names, types, nullability, and relationships for `metric`, `metadata`, `relationship`, `dimension`.  
+*   **CML Proforma & Spec**: Informs field names, types, nullability, and relationships for `metric`, `metadata`, `relationship`, `dimension`.
     Producers can continue to complete the proforma as documentation while using these programmatic schemas in code.
 *   **Ownership & curation**: This repo does not own business definitions; SMEs own and maintain metric definitions. We only provide the technical shapes to carry those definitions consistently.
 *   **Discovery & serving**: FDP National/Metadata Explore Hub will surface metrics/metadata to end users. This package helps you produce compliant data for that ecosystem.
-
-***
-
-## Using alongside the official materials
-
-We'll add links to other guidance and documentation here as it becomes available.
 
 ***
 
@@ -86,7 +115,7 @@ We'll add links to other guidance and documentation here as it becomes available
 
 *   **0.x**: Beta; spec and code may change.
 
-During beta, **breaking changes can occur**—please pin versions and read the release notes. 
+During beta, **breaking changes can occur**—please pin versions and read the [changelog](CHANGELOG.md).
 
 ***
 
@@ -107,6 +136,6 @@ MIT
 
 ***
 
-### Acknowledgements
+## Acknowledgements
 
 This package is inspired by and aligned to the **Central Metrics Library** initiative, developed with analytical teams and Platform Modernisation to fit the developing **FDP National** platform.
