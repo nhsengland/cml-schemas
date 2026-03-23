@@ -10,7 +10,7 @@ packages = [{include = "cml_schemas", from = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10, <4"
-pyspark = ">3.5"
+pyspark = ">=3.5"
 
 [build-system]
 requires = ["poetry-core"]
