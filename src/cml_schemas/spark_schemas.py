@@ -29,11 +29,11 @@ def create_dimensions_schema(dimensions: list[str]) -> StructType:
     return StructType(DIMENSIONS_SCHEMA.fields + dimension_fields)
 
 
-def select_from_schema(df: DataFrame, schema) -> DataFrame:
+def select_from_schema(df: DataFrame, schema: StructType) -> DataFrame:
     return df.select(*[field.name for field in schema.fields])
 
 
-def validate_schema(df: DataFrame, schema) -> None:
+def validate_schema(df: DataFrame, schema: StructType) -> None:
     df_types = dict(df.dtypes)
     errors = []
 
@@ -51,4 +51,3 @@ def validate_schema(df: DataFrame, schema) -> None:
 
     if errors:
         raise TypeError("Schema validation failed:\n" + "\n".join(errors))
-        
