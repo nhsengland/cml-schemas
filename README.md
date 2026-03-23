@@ -49,10 +49,6 @@ pip install cml-schemas
 
 ## Quick start (Spark)
 
-```python
-## Sample code to be added
-```
-
 ### Example: creating an empty, schema-correct DataFrame
 
 ```python
