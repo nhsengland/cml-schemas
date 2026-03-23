@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "cml-schemas"
+version = "0.1.1"
+description = "CML Spark schemas"
+authors = ["NHS England Data Science team <datascience@nhs.net>"]
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/nhsengland/cml-schemas"
+packages = [{include = "cml_schemas", from = "src"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10, <4"
+pyspark = ">=3.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)"
+]
