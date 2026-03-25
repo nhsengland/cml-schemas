@@ -3,7 +3,7 @@ import datetime
 
 from pyspark.sql.types import (
     StructType, StructField,
-    StringType, TimestampType, IntegerType
+    StringType, TimestampType, IntegerType, FloatType, BooleanType
 )
 
 from cml_schemas import spark_schemas
@@ -128,3 +128,47 @@ def test_validate_schema_reports_all_errors_at_once(spark):
     error_message = str(exc_info.value)
     assert "id" in error_message
     assert "created_at" in error_message
+
+
+# --- METRIC_SCHEMA ---
+
+def test_metric_schema_metric_value_is_integer_type():
+    field = next(f for f in spark_schemas.METRIC_SCHEMA.fields if f.name == "metric_value")
+    assert isinstance(field.dataType, IntegerType)
+
+
+# --- get_metric_schema ---
+
+@pytest.mark.parametrize("dtype_str,expected_type", [
+    ("int",    IntegerType),
+    ("float",  FloatType),
+    ("string", StringType),
+    ("bool",   BooleanType),
+])
+def test_get_metric_schema_metric_value_dtype(dtype_str, expected_type):
+    schema = spark_schemas.get_metric_schema(dtype_str)
+    field = next(f for f in schema.fields if f.name == "metric_value")
+    assert isinstance(field.dataType, expected_type)
+
+
+def test_get_metric_schema_preserves_all_other_fields():
+    schema = spark_schemas.get_metric_schema("float")
+    base_fields = {f.name: f for f in spark_schemas.METRIC_SCHEMA.fields}
+    for field in schema.fields:
+        if field.name == "metric_value":
+            continue
+        assert field.name in base_fields
+        assert field.dataType == base_fields[field.name].dataType
+        assert field.nullable == base_fields[field.name].nullable
+
+
+def test_get_metric_schema_does_not_mutate_metric_schema():
+    original_dtype = next(f for f in spark_schemas.METRIC_SCHEMA.fields if f.name == "metric_value").dataType
+    spark_schemas.get_metric_schema("string")
+    current_dtype = next(f for f in spark_schemas.METRIC_SCHEMA.fields if f.name == "metric_value").dataType
+    assert type(current_dtype) == type(original_dtype)
+
+
+def test_get_metric_schema_raises_on_invalid_dtype():
+    with pytest.raises(ValueError, match="unsupported_type"):
+        spark_schemas.get_metric_schema("unsupported_type")
