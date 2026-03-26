@@ -113,6 +113,31 @@ def test_validate_schema_raises_on_missing_column(spark):
         spark_schemas.validate_schema(df, SCHEMA)
 
 
+def test_validate_schema_raises_on_null_in_non_nullable_field(spark):
+    nullable_schema = StructType([
+        StructField("id",         StringType(),    nullable=True),
+        StructField("created_at", TimestampType(), nullable=True),
+        StructField("label",      StringType(),    nullable=True),
+    ])
+    test_data = [(None, datetime.datetime(2024, 1, 1), "a")]
+    df = spark.createDataFrame(test_data, nullable_schema)
+
+    with pytest.raises(TypeError, match="id"):
+        spark_schemas.validate_schema(df, SCHEMA)
+
+
+def test_validate_schema_allows_null_in_nullable_field(spark):
+    nullable_schema = StructType([
+        StructField("id",         StringType(),    nullable=False),
+        StructField("created_at", TimestampType(), nullable=True),
+        StructField("label",      StringType(),    nullable=True),
+    ])
+    test_data = [("1", datetime.datetime(2024, 1, 1), None)]
+    df = spark.createDataFrame(test_data, nullable_schema)
+
+    spark_schemas.validate_schema(df, SCHEMA)  # should not raise
+
+
 def test_validate_schema_reports_all_errors_at_once(spark):
     wrong_schema = StructType([
         StructField("id", IntegerType()),  # wrong type

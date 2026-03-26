@@ -1,4 +1,5 @@
 from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
 from pyspark.sql.types import StructType, StructField, StringType, TimestampType, IntegerType, FloatType, BooleanType
 
 
@@ -131,19 +132,21 @@ def select_from_schema(df: DataFrame, schema: StructType) -> DataFrame:
 
 
 def validate_schema(df: DataFrame, schema: StructType) -> None:
-    """Assert that ``df`` contains all columns defined in ``schema`` with matching types.
+    """Assert that ``df`` contains all columns defined in ``schema`` with matching types
+    and that non-nullable fields contain no null values.
 
     Args:
         df: The Spark DataFrame to validate.
         schema: The expected ``StructType`` schema.
 
     Raises:
-        TypeError: If any expected column is missing or has a mismatched type.
-            The error message lists all violations found.
+        TypeError: If any expected column is missing, has a mismatched type, or
+            violates a non-nullable constraint. The error message lists all violations found.
     """
     df_types = dict(df.dtypes)
     errors = []
 
+    non_nullable_to_check = []
     for field in schema.fields:
         col_name = field.name
 
@@ -155,6 +158,18 @@ def validate_schema(df: DataFrame, schema: StructType) -> None:
         expected = field.dataType.simpleString()
         if actual != expected:
             errors.append(f"  - '{col_name}': expected {expected}, got {actual}")
+            continue
+
+        if not field.nullable:
+            non_nullable_to_check.append(col_name)
+
+    if non_nullable_to_check:
+        null_counts = df.select(
+            *[F.count(F.when(F.col(c).isNull(), c)).alias(c) for c in non_nullable_to_check]
+        ).collect()[0]
+        for col_name in non_nullable_to_check:
+            if null_counts[col_name] > 0:
+                errors.append(f"  - '{col_name}': non-nullable field contains {null_counts[col_name]} null(s)")
 
     if errors:
         raise TypeError("Schema validation failed:\n" + "\n".join(errors))
