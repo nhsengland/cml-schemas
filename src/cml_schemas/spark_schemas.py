@@ -6,14 +6,14 @@ METRIC_SCHEMA = StructType([
     StructField("datapoint_id",                     StringType(),    nullable=False),
     StructField("metric_id",                        StringType(),    nullable=False),
     StructField("metric_dimension_id",              StringType(),    nullable=False),
-    StructField("dimension_cohort_id",              StringType(),    nullable=False),
+    StructField("dimension_cohort_id",              StringType(),    nullable=True),
     StructField("location_id",                      StringType(),    nullable=False),
     StructField("location_type",                    StringType(),    nullable=False),
     StructField("reporting_period_start_datetime",  TimestampType(), nullable=False),
     StructField("last_record_timestamp",            TimestampType(), nullable=False),
     StructField("last_ingest_timestamp",            TimestampType(), nullable=False),
-    StructField("publication_date",                 TimestampType(), nullable=False),
-    StructField("metric_value",                     IntegerType(),   nullable=True),
+    StructField("publication_date",                 TimestampType(), nullable=True),
+    StructField("metric_value",                     IntegerType(),   nullable=False),
     StructField("additional_metric_values",         StringType(),    nullable=True),
 ])
 
@@ -22,6 +22,51 @@ DIMENSIONS_SCHEMA = StructType([
     StructField("dimension_cohort_id",  StringType(), nullable=False),
     StructField("metric_id",            StringType(), nullable=False),
 ])
+
+
+RELATIONSHIPS_SCHEMA = StructType(
+    [
+        StructField("parent_metric_id", StringType(), nullable=False),
+        StructField("child_metric_id", StringType(), nullable=False),
+        StructField("relationship_type", StringType(), nullable=False),
+        StructField("relationship_category", StringType(), nullable=False),
+        StructField("relationship_description", StringType(), nullable=True),
+    ]
+)
+
+
+METADATA_SCHEMA = StructType(
+    [
+        StructField("metric_id", StringType(), nullable=False),
+        StructField("metric_category", StringType(), nullable=False),
+        StructField("metric_status", StringType(), nullable=False),
+        StructField("available_dimensions", StringType(), nullable=True),
+        StructField("business_area", StringType(), nullable=False),
+        StructField("business_sub_area", StringType(), nullable=False),
+        StructField("domain", StringType(), nullable=True),
+        StructField("source", StringType(), nullable=False),
+        StructField("metric_owner", StringType(), nullable=False),
+        StructField("metric_title", StringType(), nullable=False),
+        StructField("metric_short_name", StringType(), nullable=False),
+        StructField("metric_alias", StringType(), nullable=True),
+        StructField("metric_description", StringType(), nullable=False),
+        StructField("metric_purpose", StringType(), nullable=False),
+        StructField("unit", StringType(), nullable=False),
+        StructField("format", StringType(), nullable=False),
+        StructField("target", StringType(), nullable=True),
+        StructField("reporting_grain", StringType(), nullable=False),
+        StructField("frequency_of_refresh", StringType(), nullable=False),
+        StructField("aggregation", StringType(), nullable=False),
+        StructField("statistical_disclosure_control_flag", StringType(), nullable=False),
+        StructField("statistical_disclosure_control_description", StringType(), nullable=True),
+        StructField("interpretation", StringType(), nullable=True),
+        StructField("inclusion_exclusion_rules", StringType(), nullable=True),
+        StructField("usage", StringType(), nullable=True),
+        StructField("organisation_geog_type", StringType(), nullable=False),
+        StructField("footnotes", StringType(), nullable=True),
+        StructField("notes", StringType(), nullable=True),
+    ]
+)
 
 
 _METRIC_VALUE_DTYPE_MAP = {
