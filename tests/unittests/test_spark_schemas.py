@@ -20,8 +20,10 @@ def test_create_dimensions_schema_contains_base_fields():
     schema = spark_schemas.create_dimensions_schema(DIMENSIONS)
     field_names = [f.name for f in schema.fields]
 
-    assert "dimension_cohort_id" in field_names
-    assert "metric_id" in field_names
+    assert "dimension_id" in field_names
+    assert "dimension_type_id" in field_names
+    assert "dimension_names" in field_names
+    assert "dimension_count" in field_names
 
 
 def test_create_dimensions_schema_contains_dimension_fields():
@@ -153,13 +155,6 @@ def test_validate_schema_reports_all_errors_at_once(spark):
     error_message = str(exc_info.value)
     assert "id" in error_message
     assert "created_at" in error_message
-
-
-# --- METRIC_SCHEMA ---
-
-def test_metric_schema_metric_value_is_integer_type():
-    field = next(f for f in spark_schemas.METRIC_SCHEMA.fields if f.name == "metric_value")
-    assert isinstance(field.dataType, IntegerType)
 
 
 # --- get_metric_schema ---

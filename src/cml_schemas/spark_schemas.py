@@ -12,7 +12,7 @@ METRIC_SCHEMA = StructType([
     StructField("location_type",                    StringType(),    nullable=False),
     StructField("reporting_period_start_datetime",  TimestampType(), nullable=False),
     StructField("publication_datetime",             TimestampType(), nullable=True),
-    StructField("metric_value",                     StringType(),    nullable=False),
+    StructField("metric_value",                     IntegerType(),   nullable=False),
     StructField("additional_metric_values",         StringType(),    nullable=True),
 ])
 
