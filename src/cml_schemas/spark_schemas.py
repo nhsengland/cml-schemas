@@ -32,7 +32,6 @@ SOURCE_SCHEMA = StructType([
 DIMENSIONS_SCHEMA = StructType([
     StructField("dimension_id",       StringType(),  nullable=True),
     StructField("dimension_type_id",  StringType(),  nullable=True),
-    StructField("dimension_names",    StringType(),  nullable=True),
     StructField("dimension_count",    IntegerType(), nullable=True),
 ])
 
