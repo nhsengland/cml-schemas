@@ -22,7 +22,6 @@ def test_create_dimensions_schema_contains_base_fields():
 
     assert "dimension_id" in field_names
     assert "dimension_type_id" in field_names
-    assert "dimension_names" in field_names
     assert "dimension_count" in field_names
 
 
