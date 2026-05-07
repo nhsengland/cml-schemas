@@ -2,9 +2,9 @@
 
 **Supports CML Proforma version 2.0**
 
-A lightweight Python package providing validated **schemas for the Central Metrics Library (CML)** in (eventually) multiple formats.
+A lightweight Python package providing validated **schemas for the Central Metrics Library (CML)** in multiple formats.
 
-**Current focus:** Apache Spark (`pyspark.sql.types.StructType`).
+**Supported formats:** Apache Spark (`pyspark.sql.types.StructType`) and pandas (`pd.DataFrame`).
 
 > The Central Metrics Library (CML) defines a common structure for **metrics** and the **metadata** that describes them, so analytical teams can produce, discover, and reuse metrics consistently across the NHS. This package implements those schemas for use in data pipelines.
 
@@ -24,23 +24,22 @@ The CML—and therefore these schemas—are in **beta** while we pilot with anal
 
 ## What's in the box
 
-**Spark schemas** for core CML entities (initial set):
+**Schemas** for core CML entities (available in both Spark and pandas formats):
 
 *   `METRIC_SCHEMA` — the measured value(s) and identifiers
 *   `DIMENSIONS_SCHEMA` — base schema for dimensions used to slice metrics
+*   `SOURCE_SCHEMA` — source system metadata
+*   `METADATA_SCHEMA` — descriptive info: purpose, methodology, caveats, lineage, etc.
+*   `RELATIONSHIPS_SCHEMA` — links between metrics and other artefacts
 
-**Helper functions:**
+**Helper functions** (available in both `spark_schemas` and `pandas_schemas`):
 
+*   `get_metric_schema(metric_value_dtype)` — returns a metric schema with a custom metric value type
 *   `create_dimensions_schema(dimensions)` — builds a full dimensions schema from a list of dimension column names
 *   `select_from_schema(df, schema)` — selects and reorders DataFrame columns to match a schema
 *   `validate_schema(df, schema)` — validates a DataFrame's column names and types against a schema
 
 These mirror the "draft standardised schema" referenced in the CML materials and will track the official spec as it matures.
-
-**Coming soon:**
-
-*   `metadata` schema — descriptive info: purpose, methodology, caveats, lineage, etc.
-*   `relationship` schema — links between metrics and other artefacts
 
 ***
 
@@ -111,6 +110,48 @@ df = spark_schemas.select_from_schema(df, spark_schemas.METRIC_SCHEMA)
 
 ***
 
+## Quick start (pandas)
+
+### Use a built-in schema
+
+```python
+from cml_schemas import pandas_schemas
+
+# Validate an existing DataFrame against the metric schema
+pandas_schemas.validate_schema(df, pandas_schemas.METRIC_SCHEMA)
+```
+
+### Build a dimensions schema dynamically
+
+```python
+from cml_schemas import pandas_schemas
+
+dimensions = ["AgeGroup", "Region", "Ethnicity"]
+schema = pandas_schemas.create_dimensions_schema(dimensions)
+```
+
+### Use a typed metric schema
+
+```python
+from cml_schemas import pandas_schemas
+
+# metric_value as float64
+float_schema = pandas_schemas.get_metric_schema("float")
+```
+
+Supported metric value types: `"int"`, `"float"`, `"string"`, `"bool"`.
+
+### Select and reorder columns to match a schema
+
+```python
+from cml_schemas import pandas_schemas
+
+# Selects only the columns defined in the schema, in schema order
+df = pandas_schemas.select_from_schema(df, pandas_schemas.METRIC_SCHEMA)
+```
+
+***
+
 ## Principles for usage
 
 *   **Spec-first**: Schemas track the CML Data Specification (draft during beta). When the official fields or formats change, this package revs a minor or major version, with changelog notes. We recommend locking to a specific version of this package to avoid breaking changes when the schema is updated.
@@ -147,7 +188,7 @@ Pin to a specific version in your pipelines (`cml-schemas==x.y.z`) to protect yo
 We welcome issues and PRs, especially for:
 
 *   Gaps or mismatches vs the CML spec (with references)
-*   Additional runtime formats (e.g., JSON Schema, SQL DDL)
+*   Additional runtime formats (e.g., JSON Schema, SQL DDL, Polars)
 *   Validation and test data generators
 *   Developer experience improvements
 
