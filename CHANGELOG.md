@@ -6,6 +6,18 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.1.0] - 2026-05-07
+
+**Supports CML Proforma version 2.0**
+
+### Added
+- `pandas_schemas` module: pandas equivalents of all CML schemas (`METRIC_SCHEMA`, `DIMENSIONS_SCHEMA`, `SOURCE_SCHEMA`, `METADATA_SCHEMA`, `RELATIONSHIPS_SCHEMA`) with matching helper functions (`get_metric_schema`, `create_dimensions_schema`, `select_from_schema`, `validate_schema`)
+
+### Fixed
+- Removed erroneous `dimension_names` field from `DIMENSIONS_SCHEMA` in Spark schemas
+
+---
+
 ## [2.0.0] - 2026-04-10
 
 **Supports CML Proforma version 2.0**
