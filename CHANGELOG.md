@@ -4,6 +4,36 @@ All notable changes to this project will be documented here.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.2.0] - 2026-06-10
+
+**Supports CML Proforma version 2.0**
+
+### Changed
+- Migrated project metadata from **Poetry** (`[tool.poetry]`) to **PEP 621** (`[project]`) format.
+- Switched the build backend from **poetry-core** to **setuptools**.
+- Moved runtime dependencies into `[project.dependencies]`.
+- Moved development dependencies into `[project.optional-dependencies].dev`.
+- Replaced the Poetry package configuration with **setuptools** package discovery using the `src` layout.
+- Converted license and author metadata to PEP 621-compatible structured fields.
+- Moved the repository link into `[project.urls]`.
+
+### Added
+- Added `requires-python = ">=3.10, <4"` under `[project]`.
+- Added setuptools package configuration:
+  - `[tool.setuptools]`
+  - `[tool.setuptools.packages.find]`
+
+### Removed
+- Removed Poetry-specific sections:
+  - `[tool.poetry.dependencies]`
+  - Poetry package include configuration
+  - `poetry-core` build backend configuration
+
+### Notes
+- There are **no functional dependency changes**: `pyspark` and `pandas` version requirements remain the same.
+- This is a **packaging and build-system modernisation** change.
+
+
 ---
 
 ## [2.1.0] - 2026-05-07
