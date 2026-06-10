@@ -192,26 +192,6 @@ We welcome issues and PRs, especially for:
 *   Validation and test data generators
 *   Developer experience improvements
 
-### Setting up your environment
-
-We recommend using **GitHub Codespaces** — this repo's devcontainer will automatically install `pipx` and `poetry` for you.
-
-Once your Codespace is ready (or if you're working locally with `pipx` and `poetry` already installed):
-
-```bash
-# Install dependencies and create the virtual environment
-poetry install
-
-# Activate the environment
-poetry shell
-```
-
-To run the tests:
-
-```bash
-pytest
-```
-
 ### Branching
 
 Create a branch from `main` using a prefix that describes the type of change:
@@ -226,29 +206,29 @@ All changes must be made via a **pull request** on GitHub and require **at least
 
 ### Publishing to PyPI
 
+Before you build and publish, make sure you:
+
 1.  Bump the version in `pyproject.toml` following semver (see above)
 2.  Update [CHANGELOG.md](CHANGELOG.md) with the new version and a summary of changes
-3.  Open a PR, get it approved, and merge to `main`
-4.  On GitHub, create a new **Release** targeting `main`, using the version number as the tag (e.g. `v2.1.0`) — this triggers the publish workflow automatically
+3.  Update the README.md if new instructions are needed
+4.  Open a PR, get it approved, and merge to `main`
 
-> **One-time setup:** the publish workflow requires a PyPI API token stored as a repository secret. If the release does not trigger the package to be published, contact an owner of the package on PyPI - a token scoped to the `cml-schemas` project may need to be created in PyPI and added in GitHub under **Settings → Secrets and variables → Actions** as `PYPI_API_TOKEN`.
-
-
-#### Test PyPI
-
-**Want to do a test run first?** Publish to [Test PyPI](https://test.pypi.org/) manually:
+When you are ready:
 
 ```bash
-poetry config repositories.test-pypi https://upload.pypi.org/legacy/
-poetry config pypi-token.test-pypi <your-test-pypi-token>
-poetry publish --build --repository test-pypi
+python -m venv venv
+
+source venv/bin/activate # if on Linux or...
+source venv/Scripts/activate # if on Windows
+
+pip install build twine
+python -m build
+python -m twine upload dist/* # for PyPi or...
+python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/* # for Test PyPi
 ```
 
-Then, in a separate project to this one, verify the install from Test PyPI and make sure it's all working as you intended:
+You'll be prompted for your API token, paste it in and press enter. 
 
-```bash
-pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ cml-schemas
-```
 
 ***
 
