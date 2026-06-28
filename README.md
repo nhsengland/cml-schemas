@@ -1,6 +1,6 @@
 # Central Metrics Library Schemas (Python)
 
-**Supports CML Proforma version 2.0**
+**Supports CML Proforma version 3.0**
 
 A lightweight Python package providing validated **schemas for the Central Metrics Library (CML)** in multiple formats.
 

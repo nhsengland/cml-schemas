@@ -4,6 +4,27 @@ All notable changes to this project will be documented here.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [3.0.0] - 2026-06-28
+
+**Supports CML Proforma version 3.0**
+
+> **Breaking changes** — schema fields have changed. Pin your version.
+
+### Changed
+
+**`SOURCE_SCHEMA`**
+- Replaced `source_name`, `project_id`, `source_platform` with separate numerator and denominator variants: `numerator_source_name`, `numerator_project_id`, `numerator_source_platform`, `denominator_source_name`, `denominator_project_id`, `denominator_source_platform`
+
+**`METADATA_SCHEMA`**
+- Replaced `source_name`, `project_id`, `source_platform` with the same numerator/denominator split as `SOURCE_SCHEMA`
+
+### Added
+
+**`METADATA_SCHEMA`**
+- Added `metric_state` (non-nullable string)
+
+---
+
 ## [2.2.0] - 2026-06-10
 
 **Supports CML Proforma version 2.0**
